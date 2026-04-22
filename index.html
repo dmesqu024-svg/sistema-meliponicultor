@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Meliponicultor - Cadastro Oficial</title>
+    <style>
+        :root { --primary: #2e7d32; --bg: #f0f2f0; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: auto; background: var(--white); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        h1, h2 { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+        h2 { font-size: 1.2em; margin-top: 25px; background: #e8f5e9; padding: 10px; border-radius: 4px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9em; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; background: #fafafa; padding: 15px; border-radius: 5px; border: 1px dashed #ccc; }
+        .checkbox-item { display: flex; align-items: center; gap: 5px; font-size: 0.9em; }
+        .checkbox-item input { width: auto; }
+
+        button { width: 100%; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; font-weight: bold; margin-top: 20px; transition: 0.3s; }
+        #btnSalvar { background: var(--primary); color: white; }
+        #btnSalvar:hover { background: #1b5e20; }
+        
+        #relatorio { margin-top: 40px; }
+        .card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; position: relative; }
+        .card span { font-size: 0.8em; color: #666; }
+        .btn-delete { position: absolute; right: 10px; top: 10px; background: #c62828; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+
+        @media print { .no-print { display: none; } .container { box-shadow: none; width: 100%; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="no-print">
+        <h1>📑 Cadastro de Meliponicultor</h1>
+        <form id="cadastroForm">
+            
+            <h2>1. Identificação do Meliponicultor</h2>
+            <div class="grid">
+                <div class="full-width">
+                    <label>Nome Completo:</label>
+                    <input type="text" id="nome" required>
+                </div>
+                <div>
+                    <label>CPF/CNPJ:</label>
+                    <input type="text" id="cpf" placeholder="000.000.000-00">
+                </div>
+                <div>
+                    <label>RG / Órgão Exp:</label>
+                    <input type="text" id="rg">
+                </div>
+                <div class="full-width">
+                    <label>Endereço / Comunidade / Ramal:</label>
+                    <input type="text" id="endereco">
+                </div>
+            </div>
+
+            <h2>2. Localização e Propriedade</h2>
+            <div class="grid">
+                <div>
+                    <label>Latitude:</label>
+                    <input type="text" id="lat" placeholder="Ex: 03°13' 54,63'' S">
+                </div>
+                <div>
+                    <label>Longitude:</label>
+                    <input type="text" id="long" placeholder="Ex: 60°03' 25,01'' W">
+                </div>
+                <div class="full-width">
+                    <label>Nome da Propriedade:</label>
+                    <input type="text" id="nomePropriedade">
+                </div>
+            </div>
+
+            <h2>3. Finalidade da Atividade</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item"><input type="checkbox" name="finalidade" value="Mel"> Produção de Mel</div>
+                <div class="checkbox-item"><input type="checkbox" name="finalidade" value="Pólen"> Produção de Pólen</div>
+                <div class="checkbox-item"><input type="checkbox" name="finalidade" value="Própolis"> Extração de Própolis</div>
+                <div class="checkbox-item"><input type="checkbox" name="finalidade" value="Multiplicação"> Multiplicação</div>
+                <div class="checkbox-item"><input type="checkbox" name="finalidade" value="Educação"> Ed. Ambiental</div>
+            </div>
+
+            <h2>4. Informações das Colônias</h2>
+            <div class="grid">
+                <div class="full-width">
+                    <label>Espécie (Nome comum e científico):</label>
+                    <input type="text" id="especie" placeholder="Ex: Uruçu Boca de Renda (Melipona seminigra)">
+                </div>
+                <div>
+                    <label>Quantidade:</label>
+                    <input type="number" id="qtd">
+                </div>
+                <div>
+                    <label>Origem:</label>
+                    <select id="origem">
+                        <option value="RESGATE">RESGATE</option>
+                        <option value="DIVISÃO">DIVISÃO</option>
+                        <option value="COMPRA">COMPRA</option>
+                        <option value="CAPTURA">CAPTURA (ISCA)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" id="btnSalvar">💾 Salvar no Sistema</button>
+        </form>
+    </div>
+
+    <hr class="no-print">
+
+    <div id="relatorio">
+        <h2>📊 Relatório de Cadastros</h2>
+        <div id="listaDados"></div>
+        <button onclick="window.print()" class="no-print" style="background:#555; color:white;">🖨️ Imprimir Relatório Completo</button>
+        <button onclick="limparTudo()" class="no-print" style="background:#eee; color:#333; margin-top:10px; font-size: 0.8em;">⚠️ Apagar todos os registros</button>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('cadastroForm');
+    const lista = document.getElementById('listaDados');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Pegar finalidades selecionadas
+        const finalidades = Array.from(document.querySelectorAll('input[name="finalidade"]:checked')).map(cb => cb.value);
+
+        const registro = {
+            id: Date.now(),
+            nome: document.getElementById('nome').value,
+            cpf: document.getElementById('cpf').value,
+            endereco: document.getElementById('endereco').value,
+            lat: document.getElementById('lat').value,
+            long: document.getElementById('long').value,
+            propriedade: document.getElementById('nomePropriedade').value,
+            finalidades: finalidades.join(", "),
+            especie: document.getElementById('especie').value,
+            qtd: document.getElementById('qtd').value,
+            origem: document.getElementById('origem').value,
+            data: new Date().toLocaleDateString('pt-BR')
+        };
+
+        const banco = JSON.parse(localStorage.getItem('meliponaria_oficial')) || [];
+        banco.unshift(registro);
+        localStorage.setItem('meliponaria_oficial', JSON.stringify(banco));
+
+        alert("Cadastro realizado!");
+        form.reset();
+        renderizar();
+    });
+
+    function renderizar() {
+        const banco = JSON.parse(localStorage.getItem('meliponaria_oficial')) || [];
+        lista.innerHTML = "";
+
+        banco.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+                <button class="btn-delete no-print" onclick="excluir(${item.id})">Excluir</button>
+                <strong>Proprietário:</strong> ${item.nome} (${item.cpf})<br>
+                <strong>Propriedade:</strong> ${item.propriedade} | 📍 ${item.lat}, ${item.long}<br>
+                <strong>Colônia:</strong> ${item.qtd}x ${item.especie} (Origem: ${item.origem})<br>
+                <strong>Finais:</strong> ${item.finalidades}<br>
+                <span>📅 Registrado em: ${item.data}</span>
+            `;
+            lista.appendChild(div);
+        });
+    }
+
+    function excluir(id) {
+        if(confirm("Deseja apagar este registro?")) {
+            let banco = JSON.parse(localStorage.getItem('meliponaria_oficial'));
+            banco = banco.filter(i => i.id !== id);
+            localStorage.setItem('meliponaria_oficial', JSON.stringify(banco));
+            renderizar();
+        }
+    }
+
+    function limparTudo() {
+        if(confirm("CUIDADO: Isso apagará TODOS os dados permanentemente. Continuar?")) {
+            localStorage.removeItem('meliponaria_oficial');
+            renderizar();
+        }
+    }
+
+    window.onload = renderizar;
+</script>
+
+</body>
+</html>
